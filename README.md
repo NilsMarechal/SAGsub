@@ -5,6 +5,15 @@ This is a beta script. It intend to be improved for precision, statistics extrac
 
 If used in your works, please aknowlege Nils Marechal, Ph.D, for the developement of this script.
 
+Python-3 dependancies:
+- os library
+- numpy library
+- scipy library
+- shutil library
+- matplotlib library
+- pylab library
+- mrcfile library
+
 Prior to execute, one need to edit the apix and Planes variable in SAGsub_2_fail-pass.py
 
 - apix is the calibrated pixel size in your dataset.
