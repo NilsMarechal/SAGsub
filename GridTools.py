@@ -112,7 +112,7 @@ def MakePattern(box, plane_spacing):
 
 	center = box//2
 
-	points_box = np.around(box/plane_spacing,-1).astype(np.int)
+	points_box = np.around(box/plane_spacing,-1).astype(np.int_)
 	
 	if points_box[0]%2 == 0: points_box[0]=points_box[0]+1
 	if points_box[1]%2 == 0: points_box[1]=points_box[1]+1
