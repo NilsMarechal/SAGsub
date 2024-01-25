@@ -30,5 +30,5 @@ class MRC:
 		
 		self.data = Data
 		
-		with mrc.new(FileName) as new:
+		with mrc.new(FileName.replace('.mrc','_sub.mrc')) as new:
 			new.set_data(np.float32(self.data))
