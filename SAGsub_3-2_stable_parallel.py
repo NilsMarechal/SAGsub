@@ -83,8 +83,6 @@ def subract_lattice(mic):
         Dist2D = np.sqrt(DistX**2+DistY**2)
         Pattern_ResMatrix = apix/Dist2D*np.max(box_padded)
 
-#        Resolution_distance_test = (np.max(box_padded)/53)/(2*apix) 
-
         LowRes_Pattern = Flank_Pattern_Resolution(Pattern, Pattern_ResMatrix, 100, 40) 
 
         ### Rotate matrix for coarse peak search ###
@@ -310,7 +308,6 @@ if __name__ == '__main__':
         print('All micrographs appear to be subtracted - exiting.')
         sys.exit()
 
-#    q = Queue()
     mrc = MRC()
     if len(sub_list) == 0:
         log = open('SAGsub_3.star','w')
@@ -323,9 +320,3 @@ if __name__ == '__main__':
         log.write(result +'\n')
         log.flush()
         
-#    with Pool(args.num_proc) as pool:
-#        results = pool.map(subract_lattice, mic_list)
-        
-#    while not q.empty():
-#        ditem = q.get()
-#        log.write(ditem +'\n')
