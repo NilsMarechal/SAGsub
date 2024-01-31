@@ -83,8 +83,6 @@ def subract_lattice(mic):
         Dist2D = np.sqrt(DistX**2+DistY**2)
         Pattern_ResMatrix = apix/Dist2D*np.max(box_padded)
 
-#        Resolution_distance_test = (np.max(box_padded)/53)/(2*apix) 
-
         LowRes_Pattern = Flank_Pattern_Resolution(Pattern, Pattern_ResMatrix, 100, 40) 
 
         ### Rotate matrix for coarse peak search ###
@@ -294,7 +292,6 @@ if __name__ == '__main__':
             patterns = ["*.mrc"]
         firstMrc = mrcfile.open(f)
         pixSize = firstMrc.header.field(10).field(2)
-        print(f)
         break
  
     if '0.729' in str(pixSize):
@@ -304,7 +301,6 @@ if __name__ == '__main__':
     elif '0.901' in str(pixSize):
         apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = glacios_45k()
     else:
-        print(pixSize)
         print('This mrc was acquired in a condition, which was not yet prepared for lattice subtraction')
         print('Please contact the developer!')
         print('Exiting...')
@@ -321,8 +317,6 @@ if __name__ == '__main__':
     my_event_handler.on_modified = on_else
     my_event_handler.on_moved = on_else
 
-    print(patterns)
-        
     sub_list = glob.glob('**/*_sub.mrc', recursive=True)
     mic_list = []
     for image in ori_list:
@@ -346,6 +340,7 @@ if __name__ == '__main__':
         while True:
             time.sleep(1)
             while not q.empty():
+                time.sleep(1)  #to be sure that the file is written
                 subract_lattice(q.get())
     except KeyboardInterrupt:
         my_observer.stop()
