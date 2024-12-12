@@ -14,14 +14,14 @@ def glacios_45k():
     apix = 0.901
     Planes = 66
     Profile_threshold = 0.2 # minimum ratio of signal to consider for peak profiling
-    Sigma_threshold = 1.3
-    Patch_Size = 11 # for global peak search and peak operations
+    Sigma_threshold = 1.1 #default is 1.3, 1.1 if fusy peaks
+    Patch_Size = 21 # for global peak search and peak operations default 11, 21 if fusy peaks
     Patch_Size_Operation = 21 # 
     height = 0.3 # peak height (ratio of 1) for mosaicit search
     width = 3 # peak width (in step) for mosaicit search
     Patch_Fine = 3  # for parameters refinement only
     Pad = 200
-    Resolution_limit = 10
+    Resolution_limit = 5
     return (apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit)
     
 def glacios_73k():
@@ -58,6 +58,34 @@ def krios1_81k():
     Profile_threshold = 0.12
     Sigma_threshold = 1.3
     Patch_Size = 11
+    Patch_Size_Operation = 21
+    height = 0.3
+    width = 3
+    Patch_Fine = 3
+    Pad = 200
+    Resolution_limit = 10
+    return (apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit)    
+
+def krios1_F3():
+    apix = 1.145
+    Planes = 86
+    Profile_threshold = 0.2
+    Sigma_threshold = 1.3
+    Patch_Size = 11
+    Patch_Size_Operation = 21
+    height = 0.3
+    width = 3
+    Patch_Fine = 3
+    Pad = 200
+    Resolution_limit = 10
+    return (apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit)  
+    
+def F20_HMS():
+    apix = 1.89
+    Planes = 67
+    Profile_threshold = 0.1
+    Sigma_threshold = 1.1
+    Patch_Size = 21
     Patch_Size_Operation = 21
     height = 0.3
     width = 3
@@ -225,7 +253,27 @@ def subract_lattice(mic):
         Peak_Mask = Normalized_Peak >= Profile_threshold
 
         Bg_Mask = Normalized_Peak < Profile_threshold
-
+        
+        if args.difuse_peak:
+        
+        	ratio_threshold = 0.5
+        
+        	Peak = []
+        
+        	for i in range(Patch_Size):
+        		for j in range(Patch_Size):
+        			Peak.append([i,j])
+        	
+        	distXY = np.array(Peak) - np.array([Patch_Size//2,Patch_Size//2])
+        	dist2D = np.sqrt(distXY[:,0]**2+distXY[:,1]**2)
+        			
+        	Peak_Mask = dist2D < ratio_threshold*Patch_Size//2
+        	Bg_Mask = dist2D >= ratio_threshold*Patch_Size//2 
+        	
+        	Peak_Mask = np.array([Peak_Mask[i:i+Patch_Size] for i in range(0, len(Peak_Mask), Patch_Size)])
+        	
+        	Bg_Mask = np.array([Bg_Mask[i:i+Patch_Size] for i in range(0, len(Bg_Mask), Patch_Size)])
+               			
         ####################### Iterate through spots ################################
 
         Spot_MetaData = []
@@ -243,7 +291,7 @@ def subract_lattice(mic):
             Peak_value = np.mean(spot[Peak_Mask])
             Bg_value = np.mean(spot[Bg_Mask])
 
-            Spot_MetaData.append([Peak_value/Bg_value, Spot_Resolution])
+            Spot_MetaData.append([Peak_value/Bg_value, Spot_Resolution]) ; #print(Spot_MetaData)
 
         Spot_MetaData = np.array(Spot_MetaData) 
 
@@ -287,9 +335,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Subtracts strep lattice from micrographs kept in \"Curate Exposures\" cryoSPARC job\". Should be launched from the project folder \!")
     parser.add_argument("-n","--num_proc", type=int, default=16, help="Number of parallel processes")
     parser.add_argument("-F","--force_apix", type=float)
+    parser.add_argument("-d","--difuse_peak", type=bool, default=False)
     args = parser.parse_args()
 
-    #print(args.force_apix)
+    #print(args.difuse_peak)
     
     for f in glob.glob('**/*.mrc', recursive=True):
         if 'aligned_doseweighted' in f:
@@ -313,6 +362,10 @@ if __name__ == '__main__':
         apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = glacios_45k()
     elif '0.862' in str(pixSize):
         apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = krios1_81k()
+    elif '1.145' in str(pixSize):
+        apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = krios1_F3()
+    elif '1.89' in str(pixSize):
+        apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = F20_HMS()
     else:
         print('This mrc was acquired in a condition, which was not yet prepared for lattice subtraction')
         print('Please contact the developer!')
