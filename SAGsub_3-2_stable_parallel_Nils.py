@@ -94,6 +94,20 @@ def F20_HMS():
     Resolution_limit = 10
     return (apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit)    
     
+def talos_HMS():
+    apix = 1.10
+    Planes = 118
+    Profile_threshold = 0.1
+    Sigma_threshold = 1.3
+    Patch_Size = 21
+    Patch_Size_Operation = 21
+    height = 0.3
+    width = 3
+    Patch_Fine = 3
+    Pad = 200
+    Resolution_limit = 5
+    return (apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit)    
+    
 def subract_lattice(mic):
     LOG = [None]*4
     try:
@@ -351,7 +365,7 @@ if __name__ == '__main__':
         if args.force_apix == None:
             firstMrc = mrcfile.open(f)
             pixSize = firstMrc.header.field(10).field(2) ; #print(pixSize)
-        else: pixSize = args.force_apix
+        else: pixSize = args.force_apix ; #print(pixSize)
         break
  
     if '0.729' in str(pixSize):
@@ -366,6 +380,8 @@ if __name__ == '__main__':
         apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = krios1_F3()
     elif '1.89' in str(pixSize):
         apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = F20_HMS()
+    elif '1.1' in str(pixSize):
+        apix, Planes, Profile_threshold,Sigma_threshold, Patch_Size, Patch_Size_Operation, height, width, Patch_Fine, Pad, Resolution_limit = talos_HMS()
     else:
         print('This mrc was acquired in a condition, which was not yet prepared for lattice subtraction')
         print('Please contact the developer!')
@@ -374,7 +390,7 @@ if __name__ == '__main__':
         
     if preprocess_type == 'cryosparc':
         orri_list = glob.glob('**/*doseweighted.mrc', recursive=True)
-        sub_list = glob.glob('**/*doseweighted_sub.mrc', recursive=True)
+        sub_list = glob.glob('**/*doseweightedls_sub.mrc', recursive=True)
     elif preprocess_type == 'warp':
         orri_list = glob.glob('**/*?.mrc', recursive=True)
         orri_list = [ori for ori in orri_list if 'PS.mrc' not in ori]
